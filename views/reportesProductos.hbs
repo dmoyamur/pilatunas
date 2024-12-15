@@ -1,0 +1,74 @@
+<div id="title-users">
+    <h1>PILATUNAS PAÑALERIA</h1>
+</div>
+<div id="title-gestion">
+    <h1>Reportes de Movimientos de Inventario</h1>
+</div>
+
+<form id="filterForm">
+    <label for="startDate">Fecha Inicio:</label>
+    <input type="date" id="startDate" required>
+    <label for="endDate">Fecha Fin:</label>
+    <input type="date" id="endDate" required>
+    <button type="submit">Generar Reporte</button>
+</form>
+
+<table class="table-results">
+    <thead>
+        <tr>
+            <th>Fecha Operación</th>
+            <th>Tipo</th>
+            <th>Referencia</th>
+            <th>Descripción</th>
+            <th>Cantidad</th>
+            <th>Precio Unitario</th>
+            <th>Valor Total</th>
+        </tr>
+    </thead>
+    <tbody id="reporteData">
+    </tbody>
+</table>
+
+<div id="wrapper-comeback-menu">
+    <button id="comeback-menu">Regresar al menú</button>
+</div>
+
+
+  <script>
+    const menuBack = document.getElementById('comeback-menu').addEventListener('click', () => {
+        window.location.href = '/menu';
+    });
+
+    async function fetchProductos() {
+        try {
+            const response = await fetch('/obtener-productos');
+            const productos = await response.json();
+            updateTable(productos);
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al obtener los productos');
+        }
+    }
+
+    function updateTable(productos) {
+        const tbody = document.getElementById('productosData');
+        tbody.innerHTML = '';
+
+        productos.forEach(producto => {
+            const row = document.createElement('tr');
+            const valorTotal = producto.Precio * producto.Cantidad;
+
+            row.innerHTML = `
+                <td>${producto.Referencia}</td>
+                <td>${producto.Descripcion}</td>
+                <td>$${producto.Precio.toLocaleString()}</td>
+                <td>${producto.Cantidad}</td>
+                <td>$${valorTotal.toLocaleString()}</td>
+            `;
+
+            tbody.appendChild(row);
+        });
+    }
+
+    fetchProductos();
+</script>

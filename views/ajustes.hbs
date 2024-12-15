@@ -1,0 +1,134 @@
+<div id="title-users">
+    <h1>PILATUNAS PAÑALERIA</h1>
+</div>
+<div id="title-gestion">
+    <h1>Gestión de ajustes</h1>
+</div>
+
+<!-- Formulario para realizar ajustes -->
+<div id="form-container">
+    <div id="user-selection">
+        <label for="producto">Producto:</label>
+        <select name="referencia-producto" class="usuario-select" id="producto-select" required>
+            <option value="">Seleccione un producto</option>
+        </select>
+    </div>
+
+    <div id="quantity-display">
+        <label for="cantidad-actual">Cantidad Actual:</label>
+        <span id="cantidad-actual">0</span>
+    </div>
+
+    <div id="amount-input">
+        <label for="amount">Ajuste:</label>
+        <input type="number" id="amount" placeholder="Ingrese un número" required>
+    </div>
+
+    <div id="submit-container">
+        <button id="submit-ajuste">Confirmar Ajuste</button>
+    </div>
+</div>
+
+
+<div id="wrapper-comeback-menu">
+    <button id="comeback-menu">Regresar al menú</button>
+</div>
+
+<script>
+    const formContainer = document.getElementById("form-container");
+    const submitBtn = document.getElementById("submit-ajuste");
+    const amountInput = document.getElementById("amount");
+    const productoSelect = document.getElementById("producto-select");
+    const cantidadActual = document.getElementById("cantidad-actual");
+
+    const menuBack = document.getElementById('comeback-menu').addEventListener('click', () => {
+
+        window.location.href = '/menu';
+    });
+
+    async function cargarProductos() {
+        try {
+            const response = await fetch('/obtener-productos');
+            const productos = await response.json();
+            console.log(productos);
+            productoSelect.innerHTML = '<option value="">Seleccione un producto</option>'; // Limpiar opciones existentes
+
+            productos.forEach(producto => {
+                const option = document.createElement('option');
+                option.value = producto.Referencia;
+                option.textContent = `${producto.Descripcion} (${producto.Referencia}) `;
+                option.dataset.precio = producto.Precio;
+                option.dataset.cantidad = producto.Cantidad;
+                productoSelect.appendChild(option);
+            });
+
+        } catch (error) {
+            console.error('Error al cargar productos', error);
+            alert('No se pudieron cargar los productos');
+        }
+    }
+
+    cargarProductos();
+
+    productoSelect.addEventListener("change", function () {
+        const productoSeleccionado = productoSelect.options[productoSelect.selectedIndex];
+        if (productoSeleccionado) {
+            cantidadActual.textContent = productoSeleccionado.dataset.cantidad;
+        } else {
+            cantidadActual.textContent = '0';
+        }
+    });
+
+    submitBtn.addEventListener("click", function () {
+        const productoSeleccionado = productoSelect.value;
+        const amount = parseFloat(amountInput.value);
+
+        if (!productoSeleccionado) {
+            alert("Por favor seleccione un producto.");
+            return;
+        }
+
+        if (isNaN(amount)) {
+            alert("Por favor ingrese un número válido para el ajuste.");
+            return;
+        }
+
+        enviardatos(productoSeleccionado, amount);
+    });
+
+    async function enviardatos(productoSeleccionado, amount) {
+        try {
+
+            const cantidadAjuste = amount > 0 ? amount : Math.abs(amount);
+            const isPositive = amount > 0;
+
+            const response = await fetch('/ajusteProducto', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    referencia: productoSeleccionado,
+                    cantidad: isPositive ? cantidadAjuste : -cantidadAjuste,
+                    tipoAjuste : isPositive ? 'positivo': 'negativo'
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+
+                alert(`Ajuste realizado con éxito. Nueva cantidad: ${data.nuevaCantidad}`);
+                await cargarProductos();
+                productoSelect.selectedIndex = 0;
+                amountInput.value = '';
+                cantidadActual.textContent = '0';
+            } else {
+                alert(`Error: ${data.error}`);
+            }
+        } catch (error) {
+            console.error("Error al realizar el ajuste", error);
+            alert("Hubo un error al realizar el ajuste");
+        }
+    }
+</script>

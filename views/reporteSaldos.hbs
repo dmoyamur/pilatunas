@@ -1,0 +1,108 @@
+    <div id="title-users">
+        <h1>PILATUNAS PAÑALERIA</h1>
+    </div>
+    <div id="title-gestion">
+        <h1>Reportes de saldos</h1>
+    </div>
+
+    <form id="filterForm">
+        <label for="endDate">Fecha Corte:</label>
+        <input type="date" id="fecha-corte" required>
+        <button type="submit">Generar Reporte</button>
+
+    </form>
+
+
+    <table class="table-results">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+
+            </tr>
+        </thead>
+        <tbody id="reporteData">
+        </tbody>
+    </table>
+
+    <div id="wrapper-comeback-menu">
+        <button id="comeback-menu">Regresar al menú</button>
+    </div>
+
+    <script>
+
+
+
+        document.getElementById('comeback-menu').addEventListener('click', () => {
+            window.location.href = '/menu';
+        });
+
+        document.getElementById('filterForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const fechaCorte = document.getElementById('fecha-corte').value;
+
+    if (!fechaCorte) {
+        alert('Por favor, selecciona una fecha de corte.');
+        return;
+    }
+
+    try {
+        const url = `/reporte-saldos/${encodeURIComponent(fechaCorte)}`;
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error('Error al obtener los datos del servidor');
+        }
+
+        const saldos = await response.json();
+        console.log('Datos recibidos del servidor:', saldos); 
+        updateTable(saldos);
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Hubo un problema al generar el reporte.');
+    }
+});
+
+        function updateTable(saldos) {
+    const tbody = document.getElementById('reporteData');
+    tbody.innerHTML = '';
+
+    
+
+    console.log('Datos recibidos en updateTable:', saldos);
+
+    if (!saldos || !saldos.saldosPorProducto || !Array.isArray(saldos.saldosPorProducto)) {
+        console.error('Estructura de datos inválida:', saldos);
+        const row = document.createElement('tr');
+        row.innerHTML = `<td colspan="2">Error en los datos recibidos</td>`;
+        tbody.appendChild(row);
+        return;
+    }
+
+    console.log('Cantidad de productos en saldosPorProducto:', saldos.saldosPorProducto.length);
+
+    if (saldos.saldosPorProducto.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td colspan="2">No se encontraron productos para esta fecha.</td>`;
+        tbody.appendChild(row);
+        return;
+    }
+
+    saldos.saldosPorProducto.forEach((producto) => {
+        console.log('Procesando producto:', producto);
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${producto.descripcion} (${producto.referencia})</td>
+            <td>${Math.abs(producto.cantidad)}</td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    console.log('Tabla actualizada con:', tbody.children.length, 'filas');
+}
+
+    </script>
+
+    

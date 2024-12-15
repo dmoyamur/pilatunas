@@ -1,0 +1,290 @@
+<div id="title-users">
+    <h1>PILATUNAS PAÑALERIA</h1>
+</div>
+<div id="title-gestion">
+    <h1>Gestión de Compras</h1>
+</div>
+
+<div id="wrapper-edit">
+    <div class="block-edit" id="wrapper-form-crear">
+        <form id="comprasForm">
+            <div id="mensaje-crear" class="mensaje" style="display: none;"></div>
+
+
+            <div>
+                <h3>Productos</h3>
+                <table id="productos-compra">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-productos">
+                        <tr>
+                            <td>
+                                <select name="referencia-producto" class="producto-select" required>
+                                    <option value="">Seleccione un producto</option>
+                                </select>
+                            </td>
+                             <td>
+                                <select name="tercero" class="tercero-select" required>
+                                    <option value="">Seleccione un proveedor</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="number" name="cantidad" min="1" max="" required>
+                            </td>
+                            <td>
+                                <input type="number" name="total-producto" readonly>
+                            </td>
+                            <td>
+                                <button type="button" onclick="eliminarProducto(this)">Eliminar</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button type="button" id="agregar-producto">Agregar Producto</button>
+            </div>
+
+            <div>
+                <label for="total-venta">Total de la Venta:</label>
+                <input type="number" id="total-compra-crear" name="total-venta" readonly required>
+            </div>
+        </form>
+    </div>
+
+    <div class="block-edit" id="bottom-buttons">
+        <button id="btn-guardar" class="button-bottom-edit">Guardar Venta</button>
+        <button id="btn-regresar" class="button-bottom-edit">Regresar</button>
+    </div>
+</div>
+
+<div id="wrapper-comeback-menu">
+    <button id="comeback-menu">Regresar al menú</button>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const btnGuardar = document.getElementById('btn-guardar');
+        const btnRegresar = document.getElementById('btn-regresar');
+        const menuBack = document.getElementById('comeback-menu');
+        const agregarProductoBtn = document.getElementById('agregar-producto');
+        const listaProductos = document.getElementById('lista-productos');
+        const totalVentaInput = document.getElementById('total-compra-crear');
+        const compraForm = document.getElementById('comprasForm');
+        const proveedorSelect = document.querySelector('select[name=tercero]');
+
+
+        async function cargarTerceros() {
+            try {
+                const response = await fetch('/obtener-terceros');
+                const terceros = await response.json();
+                console.log("terceroooooooooooooos");
+                console.log(terceros);
+                const selectTemplate = document.querySelector('select[name="tercero"]');
+                selectTemplate.innerHTML = '<option value="">Seleccione un proveedor</option>'; 
+
+                terceros.forEach(tercero => {
+                    const option = document.createElement('option');
+                    option.value = tercero.nombre;
+                    option.textContent = `Nombre: ${tercero.nombre} Nit:  (${tercero.nit})`;
+                    selectTemplate.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error al cargar terceros', error);
+                mostrarMensaje('No se pudieron cargar los terceros', 'error', 'mensaje-crear');
+            }
+        }
+
+        cargarTerceros();
+
+        async function cargarProductos() {
+            try {
+                const response = await fetch('/obtener-productos');
+                const productos = await response.json();
+                console.log(productos);
+                const selectTemplate = document.querySelector('select[name="referencia-producto"]');
+                selectTemplate.innerHTML = '<option value="">Seleccione un producto</option>'; // Clear existing options
+
+                productos.forEach(producto => {
+                    const option = document.createElement('option');
+                    option.value = producto.Referencia;
+                    option.textContent = `${producto.Descripcion} (${producto.Referencia}) `;
+                    option.dataset.precio = producto.Precio;
+                    option.dataset.cantidad = producto.Cantidad;
+                    selectTemplate.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error al cargar productos', error);
+                mostrarMensaje('No se pudieron cargar los productos', 'error', 'mensaje-crear');
+            }
+        }
+
+        cargarProductos();
+
+        listaProductos.addEventListener('change', (event) => {
+            if (event.target.name === 'referencia-producto') {
+                const fila = event.target.closest('tr');
+                const selectedOption = event.target.selectedOptions[0];
+
+                //const precioUnitario = parseFloat(selectedOption.dataset.precio);
+                //const precioInput = fila.querySelector('input[name="precio-unitario"]');
+                //precioInput.value = precioUnitario.toFixed(2);
+
+                const cantidadDisponible = parseInt(selectedOption.dataset.cantidad);
+                const cantidadInput = fila.querySelector('input[name="cantidad"]');
+                cantidadInput.max = cantidadDisponible;
+                cantidadInput.value = ''; 
+
+                const totalProductoInput = fila.querySelector('input[name="total-producto"]');
+                totalProductoInput.value = '';
+
+                actualizarTotalVenta();
+            }
+        });
+
+        listaProductos.addEventListener('input', (event) => {
+            const fila = event.target.closest('tr');
+            if (fila && event.target.name === 'cantidad') {
+                const cantidad = parseFloat(event.target.value) || 0;
+                const selectProducto = fila.querySelector('select[name="referencia-producto"]');
+                const selectedOption = selectProducto.selectedOptions[0];
+                const precioUnitario = parseFloat(selectedOption.dataset.precio);
+                const totalProductoInput = fila.querySelector('input[name="total-producto"]');
+                
+                const cantidadDisponible = parseInt(selectedOption.dataset.cantidad);
+
+
+                const totalProducto = cantidad*precioUnitario;
+                totalProductoInput.value = totalProducto.toFixed(2);
+
+                actualizarTotalVenta();
+
+                };
+        });
+
+
+        proveedorSelect.addEventListener('change', () => {
+            const proveedorSeleccionado = proveedorSelect.value;
+
+        });
+        
+
+        menuBack.addEventListener('click', () => {
+            window.location.href = '/menu';
+        });
+
+        agregarProductoBtn.addEventListener('click', () => {
+            const nuevaFila = listaProductos.rows[0].cloneNode(true);
+            // Resetear todos los inputs
+            nuevaFila.querySelectorAll('input, select').forEach(input => {
+                input.value = '';
+            });
+            listaProductos.appendChild(nuevaFila);
+        });
+
+        listaProductos.addEventListener('click', (event) => {
+            if (event.target.textContent === 'Eliminar') {
+                const btn = event.target;
+                if (listaProductos.rows.length > 1) {
+                    btn.closest('tr').remove();
+                    actualizarTotalVenta();
+                }
+            }
+        });
+
+        function actualizarTotalVenta() {
+            const filasProductos = listaProductos.querySelectorAll('tr');
+            let totalVenta = 0;
+            filasProductos.forEach(fila => {
+                const totalProducto = parseFloat(fila.querySelector('input[name="total-producto"]').value || 0);
+                totalVenta += totalProducto;
+            });
+            totalVentaInput.value = totalVenta.toFixed(2);
+        }
+
+        btnGuardar.addEventListener('click', async function () {
+
+            const productos = [];
+            const filasProductos = listaProductos.querySelectorAll('tr');
+            const proveedorSelect = document.querySelector('select[name="tercero"]');
+            const proveedor = proveedorSelect.value;
+
+            if (!proveedor) {
+                mostrarMensaje("Debe seleccionar un proveedor");
+                return;
+            }
+            
+
+            for (const fila of filasProductos) {
+                const referenciaSelect = fila.querySelector('select[name="referencia-producto"]');
+                const cantidadInput = fila.querySelector('input[name="cantidad"]');
+
+                const referencia = referenciaSelect.value;
+                const cantidad = parseInt(cantidadInput.value, 10);
+
+                if (referencia && !isNaN(cantidad) && cantidad > 0) {
+                    productos.push({
+                        referencia,
+                        cantidad,
+                    });
+                }
+            }
+
+            if (productos.length === 0) {
+                mostrarMensaje('Todos los campos son obligatorios y debe haber al menos un producto.', 'error', 'mensaje-crear');
+                return;
+            }
+
+            const productosComprados = {
+                productos: productos.map(producto => ({
+                    ...producto,
+                    totalProducto: producto.cantidad * producto.Precio
+                
+                })),
+            };
+
+
+            const datosCompra  = {
+                proveedor: proveedor, 
+                productos
+            }
+
+            console.log(datosCompra);
+
+            try {   
+
+                
+                const response = await fetch('/comprar-productos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datosCompra),
+                });
+
+                const data = await response.json();
+                console.log(datosCompra);
+
+                if (response.ok) { 
+                    mostrarMensaje('Compra realizada exitosamente', 'success', 'mensaje-crear');
+                    compraForm.reset(); 
+                    cargarProductos(); 
+                } else {
+                    mostrarMensaje(data.message || 'Error al crear la venta', 'error', 'mensaje-crear');
+                }
+            } catch (error) {
+                console.error(error);
+                mostrarMensaje('Error de conexión al guardar la venta', 'error', 'mensaje-crear');
+            }
+        });
+
+        function mostrarMensaje(mensaje, tipo, elementId) {
+            const mensajeDiv = document.getElementById(elementId);
+            mensajeDiv.textContent = mensaje;
+            mensajeDiv.className = `mensaje ${tipo}`;
+            mensajeDiv.style.display = 'block';
+            setTimeout(() => { mensajeDiv.style.display = 'none'; }, 5000);
+        }
+    });
+</script>

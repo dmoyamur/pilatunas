@@ -1,0 +1,274 @@
+<div id="title-users">
+    <h1>PILATUNAS PAÑALERIA</h1>
+</div>
+<div id="title-gestion">
+    <h1>Gestión de Productos</h1>
+</div>
+
+<div id="wrapper-edit">
+    <!-- Botones principales -->
+    <div class="block-edit" id="upper-buttons">
+        <button id="btn-crear" class="button-upper-edit">Crear</button>
+        <button id="btn-modificar" class="button-upper-edit">Modificar</button>
+        <button id="btn-eliminar" class="button-upper-edit">Eliminar</button>
+    </div>
+
+    <!-- Formulario de verificación inicial -->
+    <div class="block-edit" id="wrapper-form-verificar" style="display: none;">
+        <form id="verificarForm">
+            <div id="mensaje-verificar" class="mensaje" style="display: none;"></div>
+            <div>
+                <label for="referencia-verificar">Referencia del producto:</label>
+                <input type="text" id="referencia-verificar" name="referencia-verificar" required>
+            </div>
+        </form>
+    </div>
+
+    <!-- Formulario de crear producto -->
+    <div class="block-edit" id="wrapper-form-crear" style="display: none;">
+        <form id="productoForm">
+            <div id="mensaje-crear" class="mensaje" style="display: none;"></div>
+            <div>
+                <label for="referencia">Referencia:</label>
+                <input type="text" id="referencia-crear" name="referencia" required>
+            </div>
+            <div>
+                <label for="descripcion">Descripción:</label>
+                <input type="text" id="descripcion-crear" name="descripcion" required>
+            </div>
+            <div>
+                <label for="costo">Costo:</label>
+                <input type="number" id="costo-crear" name="costo" required>
+            </div>
+            <div>
+                <label for="activo">Activo:</label>
+                <input type="checkbox" id="activo-crear" name="activo">
+            </div>
+             
+        </form>
+    </div>
+
+    <!-- Formulario de modificar producto -->
+    <div class="block-edit" id="wrapper-form-modificar" style="display: none;">
+        <form id="modificarForm">
+            <div id="mensaje-modificar" class="mensaje" style="display: none;"></div>
+            <div>
+                <label for="referencia-mod">Referencia:</label>
+                <input type="text" id="referencia-mod" name="referencia-mod" readonly>
+            </div>
+            <div>
+                <label for="descripcion-mod">Descripción:</label>
+                <input type="text" id="descripcion-mod" name="descripcion-mod" required>
+            </div>
+            <div>
+                <label for="costo-mod">Costo:</label>
+                <input type="number" id="costo-mod" name="costo-mod" required>
+            </div>
+            <div>
+                <label for="cantifad-mod">Cantidad:</label>
+                <input type="number" id="cantidad-mod" name="cantidad-mod" required>
+            </div>
+            <div>
+                <label for="activo-mod">Activo:</label>
+                <input type="checkbox" id="activo-mod" name="activo-mod">
+            </div>
+        </form>
+    </div>
+
+    <!-- Botones inferiores -->
+    <div class="block-edit" id="bottom-buttons" class="button-bottom-edit" style="display: none;">
+        <button id="btn-verificar" class="button-bottom-edit"style="display: none;">Verificar</button>
+        <button id="btn-guardar" class="button-bottom-edit"style="display: none;">Guardar</button>
+        <button id="btn-guardar-modificar" class="button-bottom-edit"style="display: none;">Guardar Modificación</button>
+        <button id="btn-regresar"class="button-bottom-edit">Regresar</button>
+    </div>
+</div>
+
+<div id="wrapper-comeback-menu">
+    <button id="comeback-menu">Regresar al menu</button>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const menuBack = document.getElementById('comeback-menu').addEventListener('click', () => {
+
+        window.location.href = '/menu';
+    });
+    const btnCrear = document.getElementById('btn-crear');
+    const btnModificar = document.getElementById('btn-modificar');
+    const btnEliminar = document.getElementById('btn-eliminar');
+    const bottomButtons = document.getElementById('bottom-buttons');
+    const btnRegresar = document.getElementById('btn-regresar');
+    const btnVerificar = document.getElementById('btn-verificar');
+    const btnGuardarMod = document.getElementById('btn-guardar-modificar');
+    const btnGuardar = document.getElementById('btn-guardar');
+
+    const wrapperFormVerificar = document.getElementById('wrapper-form-verificar');
+    const wrapperFormModificar = document.getElementById('wrapper-form-modificar');
+    const wrapperFormCrear = document.getElementById('wrapper-form-crear');
+    
+    let isDeleteAction = false;
+
+    function resetForms() {
+        wrapperFormVerificar.style.display = 'none';
+        wrapperFormModificar.style.display = 'none';
+        wrapperFormCrear.style.display = 'none';
+        bottomButtons.style.display = 'none';
+        btnVerificar.style.display = 'none';
+        btnGuardarMod.style.display = 'none';
+        btnGuardar.style.display = 'none';
+    }
+
+    btnCrear.addEventListener('click', function () {
+        resetForms();
+        wrapperFormCrear.style.display = 'block';
+        bottomButtons.style.display = 'flex';
+        btnGuardar.style.display = 'block';
+    });
+
+    btnModificar.addEventListener('click', function () {
+        resetForms();
+        wrapperFormVerificar.style.display = 'block';
+        bottomButtons.style.display = 'flex';
+        btnVerificar.style.display = 'block';
+        isDeleteAction = false;
+    });
+
+    btnEliminar.addEventListener('click', function () {
+        resetForms();
+        wrapperFormVerificar.style.display = 'block';
+        bottomButtons.style.display = 'flex';
+        btnVerificar.style.display = 'block';
+        isDeleteAction = true;
+    });
+
+    btnVerificar.addEventListener('click', async function () {
+        const referencia = document.getElementById('referencia-verificar').value;
+        
+        if (!referencia) {
+            mostrarMensaje('Por favor ingrese una referencia', 'error', 'mensaje-verificar');
+            return;
+        }
+
+        if (isDeleteAction) {
+            try {
+    const response = await fetch(`/eliminar-producto/${encodeURIComponent(referencia)}`, { method: 'DELETE' });
+    console.log('Estado de la respuesta:', response.status);
+    const data = await response.json();
+    console.log('Datos de la respuesta:', data);
+
+    if (response.ok) {
+        mostrarMensaje('Producto eliminado exitosamente', 'success', 'mensaje-verificar');
+        setTimeout(resetForms, 2000);
+    } else {
+        mostrarMensaje(data.message || 'Error al eliminar el producto', 'error', 'mensaje-verificar');
+    }
+} catch (error) {
+    console.error('Error:', error);
+    mostrarMensaje('Error al eliminar el producto', 'error', 'mensaje-verificar');
+}
+
+        } else {
+            try {
+                const response = await fetch(`/verificar-producto/${referencia}`, { method: 'GET' });
+                const data = await response.json();
+                
+                if (response.ok && data.producto) {
+                    wrapperFormVerificar.style.display = 'none';
+                    wrapperFormModificar.style.display = 'block';
+                    btnVerificar.style.display = 'none';
+                    btnGuardarMod.style.display = 'block';
+
+                    document.getElementById('referencia-mod').value = data.producto.referencia;
+                    document.getElementById('descripcion-mod').value = data.producto.descripcion;
+                    document.getElementById('costo-mod').value = data.producto.costo;
+                    document.getElementById('activo-mod').checked = data.producto.activo;
+                    document.getElementById('cantidad-mod').value = data.producto.cantidad;
+                } else {
+                    mostrarMensaje('Producto no encontrado', 'error', 'mensaje-verificar');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarMensaje('Error al verificar el producto', 'error', 'mensaje-verificar');
+            }
+        }
+    });
+
+    btnGuardar.addEventListener('click', async function () {
+        const referencia = document.getElementById('referencia-crear').value;
+        const descripcion = document.getElementById('descripcion-crear').value;
+        const costo = document.getElementById('costo-crear').value;
+        const activo = document.getElementById('activo-crear').checked;
+
+        if (!referencia || !descripcion || !costo) {
+            mostrarMensaje('Por favor complete todos los campos', 'error', 'mensaje-crear');
+            return;
+        }
+
+        try {
+            const response = await fetch('/crear-producto', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ referencia, descripcion, precio: costo, activo: activo.toString()})
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                mostrarMensaje('Producto creado exitosamente', 'success', 'mensaje-crear');
+                setTimeout(resetForms, 2000);
+            } else {
+                mostrarMensaje('Error al crear el producto', 'error', 'mensaje-crear');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            mostrarMensaje('Error al crear el producto', 'error', 'mensaje-crear');
+        }
+    });
+
+    btnGuardarMod.addEventListener('click', async function () {
+        const referencia = document.getElementById('referencia-mod').value;
+        const descripcion = document.getElementById('descripcion-mod').value;
+        const costo = document.getElementById('costo-mod').value;
+        const activo = document.getElementById('activo-mod').checked;
+        const cantidad = document.getElementById('cantidad-mod').value;
+
+        if (!descripcion || !costo) {
+            mostrarMensaje('Por favor complete todos los campos', 'error', 'mensaje-modificar');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/modificar-producto/${referencia}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ descripcion, costo, activo: activo.toString() })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                mostrarMensaje('Producto modificado exitosamente', 'success', 'mensaje-modificar');
+                setTimeout(resetForms, 2000);
+            } else {
+                mostrarMensaje('Error al modificar el producto', 'error', 'mensaje-modificar');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            mostrarMensaje('Error al modificar el producto', 'error', 'mensaje-modificar');
+        }
+    });
+
+   btnRegresar.addEventListener('click', resetForms);
+
+   function mostrarMensaje(mensaje, tipo, elementId) {
+       const mensajeDiv = document.getElementById(elementId);
+       mensajeDiv.textContent = mensaje;
+       mensajeDiv.className = `mensaje ${tipo}`;
+       mensajeDiv.style.display = 'block';
+
+       setTimeout(() => { mensajeDiv.style.display = 'none'; }, 5000);
+   }
+});
+</script>

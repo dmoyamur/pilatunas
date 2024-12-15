@@ -1,0 +1,193 @@
+<div id="title-users">
+    <h1>PILATUNAS PAÑALERIA</h1>
+</div>
+<div id="title-gestion">
+    <h1>Reportes de Movimientos de Inventario</h1>
+</div>
+
+<form id="filterForm">
+    <label for="startDate">Fecha Inicio:</label>
+    <input type="date" id="startDate" required>
+    <label for="endDate">Fecha Fin:</label>
+    <input type="date" id="endDate" required>
+    <select name="referencia-producto" class="producto-select" required>
+        <option value="">Seleccione un producto</option>
+    </select>
+    <button type="submit">Generar Reporte</button>
+
+</form>
+
+
+<table class="table-results">
+    <thead>
+        <tr>
+            <th>Fecha Operación</th>
+            <th>Tipo</th>
+            <th>Cantidad</th>
+            <th>Valor Total</th>
+            
+        </tr>
+    </thead>
+    <tbody id="reporteData">
+    </tbody>
+</table>
+
+<div id="wrapper-comeback-menu">
+    <button id="comeback-menu">Regresar al menú</button>
+</div>
+
+<script>
+
+    async function cargarProductos() {
+        try {
+            const response = await fetch('/obtener-productos');
+            const productos = await response.json();
+            const selectTemplate = document.querySelector('select[name="referencia-producto"]');
+            selectTemplate.innerHTML = '<option value="">Seleccione un producto </option>';
+
+            productos.forEach(producto => {
+                const option = document.createElement('option');
+                option.value = producto.Referencia;
+                option.textContent = `${producto.Descripcion} (${producto.Referencia}) `;
+                option.dataset.precio = producto.Precio;
+                option.dataset.cantidad = producto.Cantidad;
+                selectTemplate.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error al cargar productos', error);
+            mostrarMensaje('No se pudieron cargar los productos', 'error', 'mensaje-crear');
+        }
+    }
+
+    cargarProductos();
+    document.getElementById('comeback-menu').addEventListener('click', () => {
+        window.location.href = '/menu';
+    });
+
+    document.getElementById('filterForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        const productoRef = document.querySelector('select[name="referencia-producto"]').value;
+
+        if (!startDate || !endDate) {
+            alert('Por favor, selecciona ambas fechas.');
+            return;
+        }
+
+
+        try {
+            const url = `/reporte-movimientos/${encodeURIComponent(startDate)}/${encodeURIComponent(endDate)}/${encodeURIComponent(productoRef)}`;
+
+
+            const response = await fetch(url);
+            //console.log(url);
+
+            if (!response.ok) {
+                throw new Error('Error al obtener los datos del servidor');
+            }
+
+            const movimientos = await response.json();
+            //console.log('Movimientos recibidos:', movimientos);
+
+            updateTable(movimientos);
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Hubo un problema al generar el reporte');
+        }
+    });
+
+    function updateTable(movimientos) {
+    const tbody = document.getElementById('reporteData');
+    tbody.innerHTML = '';
+
+    if (movimientos.compras && movimientos.ventas && movimientos.ajustes) {
+        const allMovimientos = [
+            ...movimientos.compras,
+            ...movimientos.ventas,
+            ...movimientos.ajustes
+        ];
+
+        allMovimientos.forEach((movimiento) => {
+            const row = document.createElement('tr');
+            let tipoOperacion = 'Otro';
+            let cantidadTotal = 0;
+            let valorTotal = 0;
+
+            if (movimiento.totalCompra) {
+                tipoOperacion = 'Compra';
+                // Handle productos for purchases
+                cantidadTotal = movimiento.productos.cantidad || 0;
+                valorTotal = movimiento.totalCompra;
+            } else if (movimiento.VFormaPago === 'contado' || movimiento.VFormaPago === 'credito') {
+                tipoOperacion = 'Venta';
+                // Handle productos for sales
+                cantidadTotal = movimiento.productos.cantidad || 0;
+                valorTotal = movimiento.totalVenta;
+            } else if (movimiento.cantidadAjustada !== undefined && movimiento.cantidadFinal !== undefined) {
+                tipoOperacion = 'Ajuste de Inventario';
+                cantidadTotal = Math.abs(movimiento.cantidadFinal - movimiento.cantidadAjustada);
+                valorTotal = 0; // Ajustes typically don't have a monetary value
+            }
+
+            const valorDisplay = (valorTotal === 0 || valorTotal === undefined)
+                ? 'No Aplica'
+                : `$${valorTotal.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+            const fecha = parseFecha(
+                movimiento.fecha ||
+                movimiento.VFecha ||
+                movimiento.fechaOperacion
+            );
+
+            row.innerHTML = `
+                <td>${fecha}</td>
+                <td>${tipoOperacion}</td>
+                <td>${cantidadTotal}</td>
+                <td>${valorDisplay}</td>
+            `;
+
+            tbody.appendChild(row);
+        });
+    } else {
+        tbody.innerHTML = '<tr><td colspan="4">No se encontraron movimientos para este rango de fechas.</td></tr>';
+    }
+}
+
+
+    function calcularValorTotal(movimiento) {
+        if (movimiento.totalVenta) {
+            return movimiento.totalVenta;
+        } else if (movimiento.totalCompra) {
+            return movimiento.totalCompra;
+        } else {
+            return 0;
+        }
+    }
+
+   function parseFecha(fecha) {
+    if (!fecha) {
+        return 'Fecha no disponible';
+    }
+
+    try {
+        const parsedDate = new Date(fecha);
+        const localDate = new Date(parsedDate.getTime() + parsedDate.getTimezoneOffset() * 60000);
+
+        if (isNaN(localDate.getTime())) {
+            return 'Fecha inválida';
+        }
+
+        return localDate.toLocaleDateString('en-US', {
+            month: '2-digit',
+            day: '2-digit',
+            year: 'numeric'
+        });
+    } catch (error) {
+        console.error('Error parsing date:', error);
+        return 'Fecha no disponible';
+    }
+}
+
+</script>

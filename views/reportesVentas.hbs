@@ -1,0 +1,112 @@
+    <div id="container-title">
+        <h1>PILATUNAS PAÑALERA</h1>
+        <h2>Historial de Productos</h2>
+    </div>
+    <div class="date-inputs">
+        <div class="date-group">
+            <label>Desde:</label>
+            <input type="date" id="startDate">
+        </div>
+        <div class="date-group">
+            <label>Hasta:</label>
+            <input type="date" id="endDate">
+        </div>
+    </div>
+    <table class="table-results">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Operación</th>
+                <th>Referencia</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+            </tr>
+        </thead>
+        <tbody id="salesData">
+            <!-- Los datos se insertarán aquí -->
+        </tbody>
+        <tfoot>
+            <tr class="totals">
+                <td colspan="4">TOTALES</td>
+                <td id="totalProducts">0</td>
+                <td id="totalSales">$0</td>
+            </tr>
+        </tfoot>
+    </table>
+    <div id="wrapper-comeback-menu">
+        <button id="comeback-menu">Regresar al menu</button>
+    </div>
+
+    <script>
+    const menuBack = document.getElementById('comeback-menu').addEventListener('click', () => {
+        window.location.href = '/menu';
+    });
+
+    async function fetchHistorialProductos() {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        try {
+            const response = await fetch('/historial-productos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    fechaInicio: startDate,
+                    fechaFin: endDate
+                })
+            });
+
+            const historial = await response.json();
+            updateTable(historial);
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al obtener el historial de productos');
+        }
+    }
+
+    function updateTable(historial) {
+        const tbody = document.getElementById('salesData');
+        tbody.innerHTML = '';
+
+        let totalProductos = 0;
+        let totalValor = 0;
+
+        historial.forEach(registro => {
+            const row = document.createElement('tr');
+            const fecha = new Date(registro.fechaOperacion).toLocaleDateString();
+
+            row.innerHTML = `
+                <td>${fecha}</td>
+                <td>${registro.tipoOperacion}</td>
+                <td>${registro.producto.referencia}</td>
+                <td>${registro.producto.descripcion}</td>
+                <td>$${registro.producto.precio.toLocaleString()}</td>
+                <td>${registro.producto.cantidad}</td>
+            `;
+
+            tbody.appendChild(row);
+
+            totalProductos += registro.producto.cantidad;
+            totalValor += registro.producto.precio * registro.producto.cantidad;
+        });
+
+        document.getElementById('totalProducts').textContent = totalProductos;
+        document.getElementById('totalSales').textContent = `$${totalValor.toLocaleString()}`;
+    }
+
+    document.getElementById('startDate').addEventListener('change', fetchHistorialProductos);
+    document.getElementById('endDate').addEventListener('change', fetchHistorialProductos);
+
+    // Inicializar fechas
+    const today = new Date();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay());
+
+    document.getElementById('startDate').value = startOfWeek.toISOString().split('T')[0];
+    document.getElementById('endDate').value = today.toISOString().split('T')[0];
+
+    fetchHistorialProductos();
+    </script>

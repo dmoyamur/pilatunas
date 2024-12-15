@@ -1,0 +1,65 @@
+<div id="filter-background"></div>
+
+<div id="container-title">
+    <h1>PILATUNAS PAÑALERA</h1>
+</div>
+
+<div id="wrapper-menu">
+    <ul>
+        <li>ADMINISTRACIÓN
+            <ul class="submenu">
+                <li><a href="/gestionUsuarios">Gestion de Usuarios</a></li>
+            </ul>
+        </li>
+        <li>DATOS MAESTROS
+            <ul class="submenu">
+
+                <li><a href="/terceros">Terceros</a></li>
+                <li><a href="/productos">Productos</a></li>
+            </ul>
+        </li>
+        <li>TRANSACCIONES
+            <ul class="submenu">     
+                <li><a href="/ventas">Ventas</a></li>
+                <li><a href="/compras">Compras</a></li>
+                <li><a href="/ajustes">Ajustes de inventario</a></li>
+            </ul>
+        </li>
+        <li>REPORTES
+            <ul class="submenu">
+                <li><a href="/reporte-movimientos">Reportes de movimientos</a></li>
+                <li><a href="/reporte-saldos">Reportes de saldos</a></li>
+                
+            </ul>
+        </li>
+    </ul>
+</div>
+
+
+<script>
+    const menuItems = document.querySelectorAll('#wrapper-menu > ul > li');
+
+menuItems.forEach(item => {
+    item.addEventListener('click', () => {
+        const submenus = document.querySelectorAll('#wrapper-menu .submenu');
+        submenus.forEach(submenu => {
+            if (submenu !== item.querySelector('.submenu')) {
+                submenu.style.display = 'none';
+            }
+        });
+
+        const submenu = item.querySelector('.submenu');
+        if (submenu) {
+            const isVisible = submenu.style.display === 'block';
+            submenu.style.display = isVisible ? 'none' : 'block';
+
+            const content = document.getElementById('content');
+            const totalHeight = Array.from(submenus)
+                .filter(menu => menu.style.display === 'block')
+                .reduce((height, menu) => height + menu.offsetHeight, 0);
+            content.style.marginTop = totalHeight + 20 + 'px';
+        }
+    });
+});
+
+</script>

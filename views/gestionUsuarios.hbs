@@ -1,0 +1,315 @@
+
+<div id="title-users">
+    <h1>PILATUNAS PAÑALERIA</h1>
+</div>
+
+<div id="title-gestion">
+    <h1>Gestión de Usuario</h1>
+</div>
+
+<div id="wrapper-edit">
+    <div class="block-edit" id="upper-buttons">
+        <button id="btn-crear" class="button-upper-edit">Crear</button>
+        <button id="btn-modificar" class="button-upper-edit">Modificar</button>
+        <button id="btn-eliminar" class="button-upper-edit">Eliminar</button>
+    </div>
+    <!-- Formulario de verificación inicial -->
+    <div class="block-edit" id="wrapper-form-edit" style="display: none;">
+        <form id="form-verificacion">
+            <h3>Verificar Usuario</h3>
+            <label for="usuario">Usuario</label>
+            <input required placeholder="Escribe el usuario" id="usuario" name="usuario">
+            <label for="clave">Contraseña</label>
+            <input required type="password" placeholder="Escribe la contraseña" id="clave" name="clave">
+        </form>
+    </div>
+    <!-- Formulario para modificar datos -->
+    <div class="block-edit" id="wrapper-form-modificar" style="display: none;">
+        <form id="form-modificar">
+            <h3>Modificar Usuario</h3>
+            <label for="nuevo-usuario">Nuevo Usuario</label>
+            <input placeholder="Nuevo nombre de usuario" id="nuevo-usuario" name="nuevo-usuario">
+            <label for="nueva-clave">Nueva Contraseña</label>
+            <input type="password" placeholder="Nueva contraseña" id="nueva-clave" name="nueva-clave">
+            <label for="nuevo-estado">Nuevo Estado</label>
+            <input placeholder="Nuevo estado" id="nuevo-estado" name="nuevo-estado">
+        </form>
+    </div>
+    <div class="block-edit" id="bottom-buttons" style="display: none;">
+        <button id="btn-guardar" class="button-bottom-edit">Guardar</button>
+        <button id="btn-regresar" class="button-bottom-edit">Regresar</button>
+        <button id="btn-verificar" class="button-bottom-edit">Verificar</button>
+        <button id="btn-guardar-modificar" class="button-bottom-edit">Guardar Modificación</button>
+    </div>
+</div>
+
+<div id="wrapper-comeback-menu">
+    <button id="comeback-menu">Regresar al menu</button>
+</div>
+
+<script>
+    const menuBack = document.getElementById('comeback-menu').addEventListener('click', () => {
+
+        window.location.href = '/menu';
+    });
+
+    
+    const btnCrear = document.getElementById('btn-crear');
+    const btnModificar = document.getElementById('btn-modificar');
+    const btnEliminar = document.getElementById('btn-eliminar');
+    const btnVerificar = document.getElementById('btn-verificar');
+    const formVerificacion = document.getElementById('wrapper-form-edit');
+    const formModificar = document.getElementById('wrapper-form-modificar');
+    const bottomButtons = document.getElementById('bottom-buttons');
+    const upperButtons = document.getElementById('upper-buttons');
+    const btnGuardar = document.getElementById('btn-guardar');
+    const btnRegresar = document.getElementById('btn-regresar');
+    const btnGuardarModificar = document.getElementById('btn-guardar-modificar');
+
+
+
+    let modoActual = null;
+    let usuarioVerificado = null;
+
+    function showMessage(message, isError = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.textContent = message;
+        messageDiv.style.padding = '10px';
+        messageDiv.style.margin = '10px 0';
+        messageDiv.style.borderRadius = '4px';
+        messageDiv.style.backgroundColor = isError ? '#ffebee' : '#e8f5e9';
+        messageDiv.style.color = isError ? '#c62828' : '#2e7d32';
+
+        document.getElementById('wrapper-edit').insertBefore(messageDiv, formVerificacion);
+        setTimeout(() => messageDiv.remove(), 3000);
+    }
+
+    function resetForms() {
+        document.getElementById('form-verificacion').reset();
+        document.getElementById('form-modificar').reset();
+        formVerificacion.style.display = 'none';
+        formModificar.style.display = 'none';
+        bottomButtons.style.display = 'none';
+        btnGuardar.disabled = true;
+        modoActual = null;
+        usuarioVerificado = null;
+    }
+
+    function mostrarFormularioVerificacion(modo) {
+        modoActual = modo;
+        formVerificacion.style.display = 'block';
+        bottomButtons.style.display = 'flex';
+        formModificar.style.display = 'none';
+        btnGuardar.disabled = true;
+    }
+
+    async function verificarCredenciales() {
+        const usuario = document.getElementById('usuario').value;
+        const clave = document.getElementById('clave').value;
+
+        if (!usuario || !clave) {
+            showMessage('Usuario y clave son requeridos para verificar', true);
+            return;
+        }
+
+        try {
+            const response = await fetch('/verify-user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ usuario, clave })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                showMessage(data.message || 'Error al verificar usuario', true);
+                return;
+            }
+
+            usuarioVerificado = { ...data, usuarioOriginal: usuario };
+            console.log(usuarioVerificado);
+
+            if (modoActual === 'modificar') {
+                formVerificacion.style.display = 'none';
+                formModificar.style.display = 'block';
+                document.querySelector('#form-modificar h3').textContent = 'Modificar Usuario';
+
+                document.getElementById('nuevo-usuario').value = data.usuario || '';
+                document.getElementById('nueva-clave').value = ''; // Dejar clave en blanco
+                document.getElementById('nuevo-estado').value = data.estado || '';
+
+                btnGuardar.disabled = false;
+            } else if (modoActual === 'eliminar') {
+                if (confirm(`¿Está seguro que desea eliminar el usuario ${usuario}?`)) {
+                    handleGuardar();
+                }
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showMessage('Error al verificar usuario', true);
+        }
+    }
+
+    async function handleGuardarModificacion() {
+        const nuevoUsuario = document.getElementById('nuevo-usuario').value;
+        const nuevaClave = document.getElementById('nueva-clave').value;
+        const nuevoEstado = document.getElementById('nuevo-estado').value;
+
+        try {
+            const response = await fetch('http://localhost:3000/update-user', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    usuario: usuarioVerificado.usuarioOriginal,
+                    nuevoUsuario,
+                    nuevaClave,
+                    nuevoEstado,
+                }),
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                showMessage(data.message || 'Error al modificar usuario', true);
+                return;
+            }
+            showMessage('Usuario modificado correctamente');
+            resetForms();
+        } catch (error) {
+            console.error('Error:', error);
+            showMessage('Error al modificar usuario', true);
+        }
+    }
+
+
+
+    async function handleGuardar() {
+        if (modoActual === 'crear') {
+            const nuevoUsuario = document.getElementById('nuevo-usuario').value;
+            const nuevaClave = document.getElementById('nueva-clave').value;
+            const nuevoEstado = document.getElementById('nuevo-estado').value;
+
+            if (!nuevoUsuario || !nuevaClave) {
+                showMessage('Usuario y contraseña son requeridos para crear usuario', true);
+                return;
+            }
+
+            try {
+                const response = await fetch('/create-user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        usuario: nuevoUsuario,
+                        clave: nuevaClave,
+                        estado: nuevoEstado
+                    })
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.message || 'Error al crear usuario');
+                }
+
+                console.log(data);
+
+                if (data.success) {
+                    window.location.replace("/login");
+                } else {
+                    console.log('Error al crear usuario:', data.message);
+                    showMessage(data.message || 'Error al crear usuario', true);
+                }
+            } catch (error) {
+                console.error('Error detallado:', error);
+                showMessage('Error al crear usuario: ' + error.message, true);
+            }
+        } else if (modoActual === 'modificar') {
+            console.log("MODO modificar");
+            if (!usuarioVerificado) {
+                showMessage('Debe verificar el usuario primero', true);
+                return;
+            }
+            handleGuardarModificacion(); 
+        } else if (modoActual === 'eliminar') {
+            console.log("MODO eliminar");
+            const usuario = document.getElementById('usuario').value;
+
+            if (confirm('¿Está seguro que desea eliminar este usuario?')) {
+                try {
+                    const response = await fetch('/delete-user', {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ usuario })
+                    });
+
+                    const data = await response.json();
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Error al eliminar usuario');
+                    }
+
+                    showMessage('Usuario eliminado correctamente');
+                    setTimeout(resetForms, 2000);
+                } catch (error) {
+                    console.error('Error:', error);
+                    showMessage('Error al eliminar usuario: ' + error.message, true);
+                }
+            }
+        } else {
+            console.log("NINGUN MODO");
+        }
+    }
+
+
+
+    btnCrear.addEventListener('click', () => {
+        window.location.href = '/signup';
+
+
+        btnGuardar.removeEventListener('click', handleGuardarModificacion);
+        btnGuardar.addEventListener('click', handleGuardar);
+    });
+
+    btnModificar.addEventListener('click', () => {
+        resetForms();
+        modoActual = 'modificar'
+        mostrarFormularioVerificacion('modificar');
+    });
+
+
+    btnGuardarModificar.addEventListener('click', () => {
+
+        handleGuardarModificacion();
+
+    });
+
+
+    btnEliminar.addEventListener('click', () => {
+        resetForms();
+        modoActual = 'eliminar';
+        mostrarFormularioVerificacion('eliminar');
+    });
+
+    btnVerificar.addEventListener('click', verificarCredenciales);
+
+    btnGuardar.addEventListener('click', () => {
+        if (modoActual === 'modificar') {
+            handleGuardarModificacion();
+        } else {
+            handleGuardar();
+        }
+    });
+    btnRegresar.addEventListener('click', resetForms);
+
+    document.getElementById('form-modificar').addEventListener('submit', (e) => {
+        e.preventDefault();
+    });
+    document.getElementById('form-verificacion').addEventListener('submit', (e) => {
+        e.preventDefault();
+    });
+</script>

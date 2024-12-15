@@ -1,0 +1,64 @@
+<div id="container-login">
+    <form id="login-form">
+        <div class="login-block">
+            <label for="Usuario">
+                Usuario:
+            </label>
+            <input type="text" id="Usuario" name="Usuario" required placeholder="Escriba su usuario">
+            
+            <label for="Clave">
+                Contraseña:
+            </label>
+            <input type="password" id="Clave" name="Clave" required placeholder="Escriba su contraseña">
+        </div>
+
+        <div id="wrapper-button">
+            <button type="submit">Ingresar</button>
+        </div>
+    </form>
+</div>
+
+
+<div id="wrapper-button-signup">
+    <button id="redirect-signup">Crear cuenta</button>
+</div>
+
+<script>
+
+    const buttonSignup = document.getElementById('redirect-signup').addEventListener('click', () => {
+        window.location.href = '/signup';
+    });
+
+    // Escuchar el evento de envío del formulario
+    document.getElementById("login-form").addEventListener("submit", async function (event) {
+        event.preventDefault(); 
+
+        const formData = {
+            usuario: document.getElementById("Usuario").value,
+            clave: document.getElementById("Clave").value,
+        };
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert(result.message);
+                    window.location.href = "/menu";
+                } else {
+                    alert(result.message);
+                    console.log("fallo"); 
+                }
+            } catch (error) {
+                console.error("Error al iniciar sesión:", error);
+                alert("Ocurrió un error al iniciar sesión");
+            }
+    });
+
+</script>

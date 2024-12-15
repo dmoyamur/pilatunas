@@ -1,0 +1,88 @@
+<div id="container-signup">
+    <form id="signup-form">
+        <div class="signup-block">
+            <label for="Usuario">Usuario:</label>
+            <input 
+                type="text" 
+                id="Usuario" 
+                name="Usuario" 
+                required 
+                placeholder="Escriba su usuario">
+            
+            <label for="name">Nombre:</label>
+            <input 
+                type="text" 
+                id="name" 
+                name="name" 
+                required 
+                placeholder="Escriba su nombre">
+            
+            <label for="email">Correo electrónico:</label>
+            <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                required 
+                placeholder="Escriba su correo electrónico">
+            
+            <label for="Clave">Contraseña:</label>
+            <input 
+                type="password" 
+                id="Clave" 
+                name="Clave" 
+                required 
+                placeholder="Escriba su contraseña">
+        </div>
+        <div id="wrapper-button">
+            <button type="submit">Registrar</button>
+        </div>
+    </form>
+</div>
+
+
+<div id="wrapper-button-login">
+    <button id="redirect-login">Iniciar sesión</button>
+</div>
+
+
+<script>
+    const buttonLogin = document.getElementById('redirect-login').addEventListener('click', () => {
+            window.location.href = '/';
+        });
+
+
+document.getElementById("signup-form").addEventListener("submit", async function(event) {
+    event.preventDefault(); 
+    // Obtener los valores del formulario
+    const formData = {
+        usuario: document.getElementById("Usuario").value,
+        clave: document.getElementById("Clave").value,
+        nombre: document.getElementById("name").value,
+        correo: document.getElementById("email").value,
+    };
+
+    try {
+        const response = await fetch('/signup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+            alert(result.message); 
+            window.location.href = "/";
+            console.log("EXITO")
+        } else {
+            alert(result.message);
+            console.log("fallo"); 
+        }
+    } catch (error) {
+        console.error("Error al registrar usuario:", error);
+        alert("Ocurrió un error al registrar el usuario.");
+    }
+});
+
+</script>

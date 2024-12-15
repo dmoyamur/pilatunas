@@ -1,0 +1,316 @@
+<div id="title-users">
+    <h1>PILATUNAS PAÑALERIA</h1>
+</div>
+<div id="title-gestion">
+    <h1>Gestión de Terceros</h1>
+</div>
+
+<div id="wrapper-edit">
+    <!-- Botones principales -->
+    <div class="block-edit" id="upper-buttons">
+        <button id="btn-crear" class="button-upper-edit">Crear</button>
+        <button id="btn-modificar" class="button-upper-edit">Modificar</button>
+        <button id="btn-eliminar" class="button-upper-edit">Eliminar</button>
+    </div>
+
+    <!-- Formulario de verificación inicial -->
+    <div class="block-edit" id="wrapper-form-verificar" style="display: none;">
+        <form id="verificarForm">
+            <div id="mensaje-verificar" class="mensaje" style="display: none;"></div>
+            <div>
+                <label for="nit-verificar">NIT del tercero:</label>
+                <input type="text" id="nit-verificar" name="nit-verificar" required>
+            </div>
+        </form>
+    </div>
+
+    <!-- Formulario de crear tercero -->
+    <div class="block-edit" id="wrapper-form-crear" style="display: none;">
+        <form id="terceroForm">
+            <div id="mensaje-crear" class="mensaje" style="display: none;"></div>
+            <div>
+                <label for="nit">NIT:</label>
+                <input type="text" id="nit-crear" name="nit" required>
+            </div>
+            <div>
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre-crear" name="nombre" required>
+            </div>
+            <div>
+                <label for="direccion">Dirección:</label>
+                <input type="text" id="direccion-crear" name="direccion" required>
+            </div>
+            <div>
+                <label for="telefono">Teléfono:</label>
+                <input type="text" id="telefono-crear" name="telefono" required>
+            </div>
+            <div>
+                <label for="ciudad">Ciudad:</label>
+                <input type="text" id="ciudad-crear" name="ciudad" required>
+            </div>
+            <div>
+                <label for="email">Email:</label>
+                <input type="email" id="email-crear" name="email" required>
+            </div>
+            <div>
+                <label for="activo">Activo:</label>
+                <input type="checkbox" id="activo-crear" name="activo">
+            </div>
+        </form>
+    </div>
+
+    <!-- Formulario de modificar tercero -->
+    <div class="block-edit" id="wrapper-form-modificar" style="display: none;">
+        <form id="modificarForm">
+            <div id="mensaje-modificar" class="mensaje" style="display: none;"></div>
+            <div>
+                <label for="nit-mod">NIT:</label>
+                <input type="text" id="nit-mod" name="nit-mod" readonly>
+            </div>
+            <div>
+                <label for="nombre-mod">Nombre:</label>
+                <input type="text" id="nombre-mod" name="nombre-mod" required>
+            </div>
+            <div>
+                <label for="direccion-mod">Dirección:</label>
+                <input type="text" id="direccion-mod" name="direccion-mod" required>
+            </div>
+            <div>
+                <label for="telefono-mod">Teléfono:</label>
+                <input type="text" id="telefono-mod" name="telefono-mod" required>
+            </div>
+            <div>
+                <label for="ciudad-mod">Ciudad:</label>
+                <input type="text" id="ciudad-mod" name="ciudad-mod" required>
+            </div>
+            <div>
+                <label for="email-mod">Email:</label>
+                <input type="email" id="email-mod" name="email-mod" required>
+            </div>
+            <div>
+                <label for="activo-mod">Activo:</label>
+                <input type="checkbox" id="activo-mod" name="activo-mod">
+            </div>
+        </form>
+    </div>
+
+    <!-- Botones inferiores -->
+    <div class="block-edit" id="bottom-buttons" style="display: none;">
+        <button id="btn-verificar" class="button-bottom-edit" style="display: none;">Verificar</button>
+        <button id="btn-guardar"class="button-bottom-edit" style="display: none;">Guardar</button>
+        <button id="btn-guardar-modificar"class="button-bottom-edit" style="display: none;">Guardar Modificación</button>
+        <button id="btn-regresar" class="button-bottom-edit">Regresar</button>
+    </div>
+</div>
+
+<div id="wrapper-comeback-menu">
+    <button id="comeback-menu">Regresar al menu</button>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const menuBack = document.getElementById('comeback-menu').addEventListener('click', () => {
+
+        window.location.href = '/menu';
+    });
+    // Referencias a elementos
+    const btnCrear = document.getElementById('btn-crear');
+    const btnModificar = document.getElementById('btn-modificar');
+    const btnEliminar = document.getElementById('btn-eliminar');
+    const bottomButtons = document.getElementById('bottom-buttons');
+    const btnRegresar = document.getElementById('btn-regresar');
+    const btnVerificar = document.getElementById('btn-verificar');
+    const btnGuardarMod = document.getElementById('btn-guardar-modificar');
+    const btnGuardar = document.getElementById('btn-guardar');
+
+    // Referencias a formularios
+    const wrapperFormVerificar = document.getElementById('wrapper-form-verificar');
+    const wrapperFormModificar = document.getElementById('wrapper-form-modificar');
+    const wrapperFormCrear = document.getElementById('wrapper-form-crear');
+    
+    // Estado para distinguir entre modificar y eliminar
+    let isDeleteAction = false;
+
+    function resetForms() {
+        wrapperFormVerificar.style.display = 'none';
+        wrapperFormModificar.style.display = 'none';
+        wrapperFormCrear.style.display = 'none';
+        bottomButtons.style.display = 'none';
+        btnVerificar.style.display = 'none';
+        btnGuardarMod.style.display = 'none';
+        btnGuardar.style.display = 'none';
+    }
+
+    // Mostrar formulario de crear
+    btnCrear.addEventListener('click', function () {
+        resetForms();
+        wrapperFormCrear.style.display = 'block';
+        bottomButtons.style.display = 'flex';
+        btnGuardar.style.display = 'block';
+    });
+
+    // Mostrar formulario de verificación para modificar
+    btnModificar.addEventListener('click', function () {
+        resetForms();
+        wrapperFormVerificar.style.display = 'block';
+        bottomButtons.style.display = 'flex';
+        btnVerificar.style.display = 'block';
+        isDeleteAction = false;
+    });
+
+    // Mostrar formulario de verificación para eliminar
+    btnEliminar.addEventListener('click', function () {
+        resetForms();
+        wrapperFormVerificar.style.display = 'block';
+        bottomButtons.style.display = 'flex';
+        btnVerificar.style.display = 'block';
+        isDeleteAction = true;
+    });
+
+    // Confirmar y eliminar tercero
+    btnVerificar.addEventListener('click', async function () {
+        const nit = document.getElementById('nit-verificar').value;
+        
+        if (!nit) {
+            mostrarMensaje('Por favor ingrese un NIT', 'error', 'mensaje-verificar');
+            return;
+        }
+
+        if (isDeleteAction) {
+            try {
+                const response = await fetch(`/eliminar-tercero/${encodeURIComponent(nit)}`, { 
+                    method: 'DELETE' 
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    mostrarMensaje('Tercero eliminado exitosamente', 'success', 'mensaje-verificar');
+                    setTimeout(resetForms, 2000);
+                } else {
+                    mostrarMensaje(data.message || 'Error al eliminar el tercero', 'error', 'mensaje-verificar');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarMensaje('Error al eliminar el tercero', 'error', 'mensaje-verificar');
+            }
+        } else {
+            try {
+                const response = await fetch(`/verificar-tercero/${nit}`, { method: 'GET' });
+                const data = await response.json();
+                
+                if (response.ok && data.tercero) {
+                    wrapperFormVerificar.style.display = 'none';
+                    wrapperFormModificar.style.display = 'block';
+                    btnVerificar.style.display = 'none';
+                    btnGuardarMod.style.display = 'block';
+
+                    // Llenar formulario con datos del tercero
+                    document.getElementById('nit-mod').value = data.tercero.nit;
+                    document.getElementById('nombre-mod').value = data.tercero.nombre;
+                    document.getElementById('direccion-mod').value = data.tercero.direccion;
+                    document.getElementById('telefono-mod').value = data.tercero.telefono;
+                    document.getElementById('ciudad-mod').value = data.tercero.ciudad;
+                    document.getElementById('email-mod').value = data.tercero.email;
+                    document.getElementById('activo-mod').checked = data.tercero.activo;
+                } else {
+                    mostrarMensaje('Tercero no encontrado', 'error', 'mensaje-verificar');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarMensaje('Error al verificar el tercero', 'error', 'mensaje-verificar');
+            }
+        }
+    });
+
+    // Guardar nuevo tercero
+    btnGuardar.addEventListener('click', async function () {
+
+            nit =  document.getElementById('nit-crear').value,
+            nombre=  document.getElementById('nombre-crear').value,
+            direccion =  document.getElementById('direccion-crear').value,
+            telefono=  document.getElementById('telefono-crear').value,
+            ciudad =  document.getElementById('ciudad-crear').value,
+            email =  document.getElementById('email-crear').value,
+            activo =  document.getElementById('activo-crear').checked
+
+        if (!nit || !nombre || !direccion || 
+            !telefono || !ciudad || !email) {
+            mostrarMensaje('Por favor complete todos los campos', 'error', 'mensaje-crear');
+            return;
+        }
+
+        try {
+            const response = await fetch('/crear-tercero', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nit, nombre, direccion, telefono, ciudad, email, activo})
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                mostrarMensaje('Tercero creado exitosamente', 'success', 'mensaje-crear');
+                setTimeout(resetForms, 2000);
+            } else {
+                mostrarMensaje(data.message || 'Error al crear el tercero', 'error', 'mensaje-crear');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            mostrarMensaje('Error al crear el tercero', 'error', 'mensaje-crear');
+        }
+    });
+
+    // Guardar modificaciones
+    btnGuardarMod.addEventListener('click', async function () {
+        const tercero = {
+            nombre: document.getElementById('nombre-mod').value,
+            direccion: document.getElementById('direccion-mod').value,
+            telefono: document.getElementById('telefono-mod').value,
+            ciudad: document.getElementById('ciudad-mod').value,
+            email: document.getElementById('email-mod').value,
+            activo: document.getElementById('activo-mod').checked
+        };
+
+        if (!tercero.nombre || !tercero.direccion || !tercero.telefono || 
+            !tercero.ciudad || !tercero.email) {
+            mostrarMensaje('Por favor complete todos los campos', 'error', 'mensaje-modificar');
+            return;
+        }
+
+        const nit = document.getElementById('nit-mod').value;
+
+        try {
+            const response = await fetch(`/modificar-tercero/${nit}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(tercero)
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                mostrarMensaje('Tercero modificado exitosamente', 'success', 'mensaje-modificar');
+                setTimeout(resetForms, 2000);
+            } else {
+                mostrarMensaje(data.message || 'Error al modificar el tercero', 'error', 'mensaje-modificar');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            mostrarMensaje('Error al modificar el tercero', 'error', 'mensaje-modificar');
+        }
+    });
+
+    // Ocultar formularios al regresar
+    btnRegresar.addEventListener('click', resetForms);
+
+    function mostrarMensaje(mensaje, tipo, elementId) {
+        const mensajeDiv = document.getElementById(elementId);
+        mensajeDiv.textContent = mensaje;
+        mensajeDiv.className = `mensaje ${tipo}`;
+        mensajeDiv.style.display = 'block';
+
+        setTimeout(() => { mensajeDiv.style.display = 'none'; }, 5000);
+    }
+});
+</script>
