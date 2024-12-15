@@ -51,7 +51,7 @@ const obtenerMovimientos = async (fechaCorte, cantidades) => {
 
     console.log('Productos inicializados:', Object.keys(cantidadesPorProducto).length);
 
-    const ajustes = await HistorialAjustes.find({
+    const ajustes = await HistorialAjustes.aggregate({
         fecha: { $lte: fin }
     }).sort({ fecha: 1 });
 
@@ -75,7 +75,7 @@ const obtenerMovimientos = async (fechaCorte, cantidades) => {
 
     // Procesar movimientos
     ajustes.forEach(ajuste => {
-        const referencia = ajuste.producto;
+        const referencia = ajuste.producto.referencia;
         if (cantidadesPorProducto[referencia]) {
             cantidadesPorProducto[referencia].cantidad += ajuste.cantidadAjustada;
         }

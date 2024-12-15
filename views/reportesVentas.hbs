@@ -1,4 +1,10 @@
 <div id="filter-background"></div>
+
+<script src=""https://unpkg.com/xlsx@0.16.9/dist/xlsx.full.min.js"></script>
+    <script src ="https://unpkg.com/file-saverjs@latest/FilseSaver.min.js"></script>
+    <script src ="https://unpkg.com/tableexport@latest/dist/js/tableexport.min.js"></script>
+
+
     <div id="container-title">
         <h1>PILATUNAS PAÑALERA</h1>
         <h2>Historial de Productos</h2>
@@ -110,4 +116,24 @@
     document.getElementById('endDate').value = today.toISOString().split('T')[0];
 
     fetchHistorialProductos();
-    </script>
+
+<button id="btnExportar" class="btn-success">
+<i class="fas fa-file-excel"></i> Exportar Datos
+    </button>
+
+</script>
+
+<script>
+    const $btnExportar = document.querySelector("#btnExportar")
+    $tabla = documento.querySelector("#tabla")
+
+    $btnExportar.addEventListener("clic", function() {
+        let table Export = new TableExport($tabla,{
+        filename: "SaldosInventario", //Saldos Inventario
+        sheetname:"SaldosInventario", //Saldos Inv
+    });
+    let datos = tableExport.getExportData();
+    let preferenciasDocumento = datos.tabla.xlsx;
+    tableExport.export2file(saldos.data, preferenciasDocumento.data, preferenciasDocumento.mimeType, preferenciasDocumento.filename)
+    })
+</script>
