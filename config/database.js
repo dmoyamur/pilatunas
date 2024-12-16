@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 export const connectDB = async () => {
     try {
-        const conn = await mongoose.connect(process.env.MONGO_URI || 'mongodb://atlas-sql-674f90d21e0232215de0fdd9-oq7cr.a.query.mongodb.net/Pilatunas?ssl=true&authSource=admin');
+        const conn = await mongoose.connect(process.env.MONGO_URI || 'mongodb+srv://julianhomezdev:M1oDnsbIo4HJ37a6@cluster0.kwqwh.mongodb.net/pilatunas_db');
         console.log(`MongoDB conectado: ${conn.connection.host}`);
         
         mongoose.connection.on('error', (err) => {
