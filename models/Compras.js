@@ -33,4 +33,4 @@ const CompraSchema = new Schema({
     }
 });
 
-export default mongoose.model('Compras', CompraSchema);
+export const Compras =model('Compras', CompraSchema);
