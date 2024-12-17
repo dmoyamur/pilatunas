@@ -1,5 +1,5 @@
 import Productos from "../models/Productos.js";
-import Compras from "../models/Compras.js";
+import {Compras} from "../models/Compras.js";
 
 export const comprarProductos = async (req, res) => {
     try {
@@ -59,7 +59,7 @@ export const comprarProductos = async (req, res) => {
             proveedor, 
             productos: productosComprados,
             totalCompra,
-            fecha: new Date()
+            fecha
         });
 
         await nuevaCompra.save();

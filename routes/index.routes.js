@@ -108,7 +108,7 @@ router.get('/obtener-terceros', obtenerTerceros);
 router.get('/reporte-ventas/:fechaInicio/:fechaFin', generarReporteVentas);
 router.post('/reporte-productos', obtenerHistorialProductos); 
 
-router.post('/comprar-productos', comprarProductos);
+
 
 
 router.get('/reporte-movimientos/:fechaInicio/:fechaFin/:productoRef', generarReporte);

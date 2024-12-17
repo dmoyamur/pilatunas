@@ -1,39 +1,36 @@
 // models/Compras.js
-import mongoose from "mongoose";
+import { Schema, model } from "mongoose";
 
-const comprasSchema = new mongoose.Schema({
-    productos: [{
-        referencia: {
-            type: String,
-            required: true
-        },
-        descripcion: {
-            type: String,
-            required: true
-        },
-        cantidad: {
-            type: Number,
-            required: true,
-            min: 1
-        }
-    }],
-    totalCompra: {
+const ProductoCompraSchema = new Schema({
+    referencia: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    cantidad: {
         type: Number,
         required: true,
-        min: 0
-    },
-    fecha: {
-        type: Date,
-        default: Date.now,
-        required: true
+        min: 1
     }
-    ,
-        proveedor: {
-            type: String,
-            required: true,
-        }
-}, {
-    timestamps: true 
 });
 
-export default mongoose.model('Compras', comprasSchema);
+// Esquema para la compra
+const CompraSchema = new Schema({
+    CFecha: { 
+        type: Date, 
+        required: true,
+
+    },
+    CFormaPago: { 
+        type: String,
+        required: true 
+    },
+    productos: [ProductoCompraSchema],
+    totalCompra: { 
+        type: Number, 
+        required: true, 
+        min: 0 
+    }
+});
+
+export const Compras =model('Compras', CompraSchema);
