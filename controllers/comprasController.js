@@ -1,54 +1,82 @@
 import Productos from "../models/Productos.js";
 import {Compras} from "../models/Compras.js";
-import mongoose from 'mongoose'; 
 
-export const crearCompra = async (req, res) => {
-    const session = await mongoose.startSession();
+export const comprarProductos = async (req, res) => {
     try {
-        session.startTransaction();
-        const { CFecha, CFormaPago, productos, totalCompra, tercero } = req.body;
+        const { proveedor, productos } = req.body; 
 
-        for (const producto of productos) {
-            const productoInventario = await Productos.findOne({ Referencia: producto.referencia });
-            
-            if (!productoInventario) {
-                await session.abortTransaction();
-                return res.status(404).json({ message: `Producto con referencia ${producto.referencia} no encontrado.` });
-            }
+        if (!proveedor) {
+            return res.status(400).json({
+                mensaje: 'Debe proporcionar un proveedor válido.'
+            });
+        }
 
-            if (productoInventario.Cantidad < producto.cantidad) {
-                await session.abortTransaction();
+        if (!productos || productos.length === 0) {
+            return res.status(400).json({
+                mensaje: 'Debe proporcionar al menos un producto para comprar.'
+            });
+        }
+
+        let totalCompra = 0;
+        const productosComprados = [];
+
+        for (const item of productos) {
+            if (!item.cantidad || isNaN(item.cantidad) || item.cantidad <= 0) {
                 return res.status(400).json({
-                    message: `Stock insuficiente para el producto ${producto.referencia}. Stock actual: ${productoInventario.Cantidad}`
+                    mensaje: `Cantidad inválida para el producto ${item.referencia}`
                 });
             }
 
-            productoInventario.Cantidad -= producto.cantidad;
-            await productoInventario.save({ session });
+            const producto = await Productos.findOne({ Referencia: item.referencia });
+
+            if (!producto) {
+                return res.status(400).json({
+                    mensaje: `Producto con referencia ${item.referencia} no encontrado.`
+                });
+            }
+
+            if (!producto.Activo) {
+                return res.status(400).json({
+                    mensaje: `El producto ${producto.Referencia} no está disponible.`
+                });y
+            }
+
+            const subtotal = producto.Precio * item.cantidad;
+            totalCompra += subtotal;
+
+            producto.Cantidad = Number(producto.Cantidad) + Number(item.cantidad);
+            await producto.save();
+
+            productosComprados.push({
+                referencia: producto.Referencia,
+                descripcion: producto.Descripcion,
+                cantidad: item.cantidad,
+                precioUnitario: producto.Precio,
+            });
         }
 
         const nuevaCompra = new Compras({
-            CFecha,
-            CFormaPago,
-            productos,
-            totalVenta,
-            tercero
+            proveedor, 
+            productos: productosComprados,
+            totalCompra,
+            fecha: new Date()
         });
 
-        const CompraGuardada = await nuevaCompra.save({ session });
+        await nuevaCompra.save();
 
-        await session.commitTransaction();
-        res.status(201).json({ message: "Compra creada con éxito.", compra: CompraGuardada });
+        res.status(200).json({
+            mensaje: 'Compra realizada con éxito.',
+            compra: nuevaCompra
+        });
 
     } catch (error) {
-        await session.abortTransaction();
-        console.error("Error al crear la venta:", error);
-        res.status(500).json({ message: "Error al crear la venta.", error: error.message });
-    } finally {
-        session.endSession();
+        console.error('Error al procesar la compra:', error);
+        res.status(500).json({
+            mensaje: 'Error interno del servidor.',
+            error: error.message
+        });
     }
 };
-
 
 
 export const generarReporteCompras = async (req, res) => {
