@@ -27,7 +27,7 @@ export const crearCompra = async (req, res) => {
             await productoInventario.save({ session });
         }
 
-        const nuevaVenta = new Ventas({
+        const nuevaCompra = new Compras({
             CFecha,
             CFormaPago,
             productos,
@@ -38,7 +38,7 @@ export const crearCompra = async (req, res) => {
         const CompraGuardada = await nuevaCompra.save({ session });
 
         await session.commitTransaction();
-        res.status(201).json({ message: "Compra creada con éxito.", compra: compraGuardada });
+        res.status(201).json({ message: "Compra creada con éxito.", compra: CompraGuardada });
 
     } catch (error) {
         await session.abortTransaction();
