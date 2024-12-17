@@ -3,9 +3,9 @@ import { Router } from "express";
 import { crearProducto, verificarProducto, modificarProducto, eliminarProducto, obtenerProductos,  obtenerHistorialProductos } from "../controllers/productController.js";
 
 import { crearTercero, verificarTercero, modificarTercero, eliminarTercero, obtenerTerceros } from "../controllers/tercerosController.js";
-import { crearVenta, reportesFechas } from "../controllers/ventasController.js";
+import { crearVenta, generarReporteVentas } from "../controllers/ventasController.js";
 import { obtenerUsuarios } from "../controllers/userController.js";
-import { comprarProductos } from "../controllers/comprasController.js";
+import { comprarProductos, generarReporteCompras } from "../controllers/comprasController.js";
 import { ajusteProducto } from "../controllers/ajusteController.js";
 import { generarReporte } from "../controllers/reportesMovimientosControllers.js";
 import { generarReporteSaldos } from "../controllers/saldosController.js";
@@ -77,6 +77,11 @@ router.get('/reporte-saldos', (req, res) => {
   res.render("reporteSaldos");
 });
 
+// Ruta para ver reportes de compras
+router.get('/reporte-compras', (req, res) => {
+  res.render("reporteCompras");
+});
+
 router.post('/ajusteProducto', ajusteProducto);
 router.post('/crear-producto', crearProducto);
 router.get('/verificar-producto/:referencia', verificarProducto);
@@ -100,8 +105,7 @@ router.get('/obtener-productos', obtenerProductos);
 
 router.get('/obtener-terceros', obtenerTerceros);
 
-router.post('/reporte-ventas', reportesFechas);
-
+router.get('/reporte-ventas/:fechaInicio/:fechaFin', generarReporteVentas);
 router.post('/reporte-productos', obtenerHistorialProductos); 
 
 router.post('/comprar-productos', comprarProductos);
@@ -110,6 +114,9 @@ router.post('/comprar-productos', comprarProductos);
 router.get('/reporte-movimientos/:fechaInicio/:fechaFin/:productoRef', generarReporte);
 
 router.get('/reporte-saldos/:fechaCorte', generarReporteSaldos);
+
+router.get('/reporte-compras/:fechaInicio/:fechaFin', generarReporteCompras);
+
 
 
 

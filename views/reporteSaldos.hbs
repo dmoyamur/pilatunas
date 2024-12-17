@@ -1,12 +1,7 @@
- <div id="filter-background"></div>
-
-     <script src ="https://unpkg.com/file-saverjs@latest/FilseSaver.min.js"></script>
-    <script src ="https://unpkg.com/tableexport@latest/dist/js/tableexport.min.js"></script>
-
+<div id="filter-background"></div>
     <div id="title-users">
-        <h1>PILATUNAS PAÑALERIA</h1>
+        <h1>PILATUNAS PAÑALERA</h1>
     </div>
-
     <div id="title-gestion">
         <h1>Reportes de saldos</h1>
     </div>
@@ -15,8 +10,8 @@
         <label for="endDate">Fecha Corte:</label>
         <input type="date" id="fecha-corte" required>
         <button type="submit">Generar Reporte</button>
-    </form>
 
+    </form>
 
 
     <table class="table-results">
@@ -74,8 +69,6 @@
     const tbody = document.getElementById('reporteData');
     tbody.innerHTML = '';
 
-    
-
     console.log('Datos recibidos en updateTable:', saldos);
 
     if (!saldos || !saldos.saldosPorProducto || !Array.isArray(saldos.saldosPorProducto)) {
@@ -110,17 +103,3 @@
 }
 
     </script>
-
-<script>
-
-
-    $btnExportar.addEventListener("clic", function() {
-        let table Export = new TableExport($tabla,{
-        filename: "SaldosInventario", //Saldos Inventario
-        sheetname:"SaldosInventario", //Saldos Inv
-    });
-    let datos = tableExport.getExportData();
-    let preferenciasDocumento = datos.tabla.xlsx;
-    tableExport.export2file(saldos.data, preferenciasDocumento.data, preferenciasDocumento.mimeType, preferenciasDocumento.filename)
-    })
-</script>

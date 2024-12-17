@@ -82,4 +82,65 @@ export const reportesFechas = async (req, res) => {
     }
 };
 
-export default {crearVenta, reportesFechas};
+
+export const generarReporteVentas = async (req, res) => {
+    try {
+        const { fechaInicio: startDate, fechaFin: endDate } = req.params;
+
+        console.log('Received dates:', { startDate, endDate }); 
+
+        const parseDate = (dateString) => {
+            if (!dateString) {
+                console.error('Date string is undefined or empty');
+                throw new Error(`Invalid date: ${dateString}`);
+            }
+
+            const parsedDate = new Date(dateString);
+            
+            if (isNaN(parsedDate.getTime())) {
+                console.error(`Failed to parse date: ${dateString}`);
+                throw new Error(`Invalid date: ${dateString}`);
+            }
+
+            return parsedDate;
+        };
+
+        const start = parseDate(startDate);
+        start.setHours(0, 0, 0, 0);
+
+        const end = parseDate(endDate);
+        end.setHours(23, 59, 59, 999);
+
+        console.log('Parsed dates:', { start, end }); 
+        const ventas = await Ventas.find({
+            VFecha: {
+                $gte: start, 
+                $lte: end    
+            }
+        }).sort({ VFecha: 1 }); 
+
+        console.log('Found sales:', ventas.length); 
+
+        if (!ventas || ventas.length === 0) {
+            return res.status(404).json({ 
+                message: 'No se encontraron ventas en el rango de fechas especificado' 
+            });
+        }
+
+        const reporteVentas = ventas.map(venta => ({
+            VFecha: venta.VFecha,
+            totalVenta: venta.totalVenta,
+            VFormaPago: venta.VFormaPago
+        }));
+
+        res.json(reporteVentas);
+    } catch (error) {
+        console.error('Error al generar reporte de ventas:', error);
+        res.status(500).json({ 
+            message: 'Error interno del servidor', 
+            error: error.message 
+        });
+    }
+};
+
+export default {crearVenta, reportesFechas, generarReporteVentas};

@@ -1,6 +1,6 @@
 <div id="filter-background"></div>
 <div id="title-users">
-    <h1>PILATUNAS PAÑALERIA</h1>
+    <h1>PILATUNAS PAÑALERA</h1>
 </div>
 <div id="title-gestion">
     <h1>Gestión de ajustes</h1>
@@ -57,7 +57,7 @@
             productos.forEach(producto => {
                 const option = document.createElement('option');
                 option.value = producto.Referencia;
-                option.textContent = `${producto.Descripcion} (${producto.Referencia}) `;
+                option.textContent = `${producto.Descripcion} (${producto.Referencia}) - Cantidad: ${producto.Cantidad}`;
                 option.dataset.precio = producto.Precio;
                 option.dataset.cantidad = producto.Cantidad;
                 productoSelect.appendChild(option);
