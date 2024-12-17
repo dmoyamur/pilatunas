@@ -186,11 +186,11 @@ input {
 .button-upper-edit {
     width: 150px;
     height: 40px;
-    background-color: #5a7257;
+    background-color: #374735;
     border-radius: 20px;
     border: none;
     cursor: pointer;
-    color: white;
+    color:white
 }
 
 #wrapper-form-edit {
@@ -202,7 +202,8 @@ input {
 }
 
 #wrapper-form-edit form {
-    display:     flex;
+    display: 
+    flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -210,7 +211,8 @@ input {
 }
 
 #productoForm {
-    display: flex;
+    display: 
+    flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -233,11 +235,11 @@ input {
 .button-bottom-edit {
     width: 150px;
     height: 50px;
-    background-color: #5a7257;
+    background-color: #374735;
     border-radius: 20px;
     border: none;
     cursor: pointer;
-    color: white;
+    color: white
 }
 
 #wrapper-menu {
@@ -295,7 +297,7 @@ input {
 }
 
 #wrapper-close button {
-    background-color: #5a7257;
+    background-color: #374735;
     width: 150px;
     height: 40px;
     border-radius: 20px;
@@ -320,11 +322,22 @@ input {
     width: 150px;
     height: 35px;
     border-radius: 20px;
-    background-color: #5a7257;
+    background-color: #374735;
     color: white;
     border: none;
     cursor: pointer;
 }
+
+#wrapper-cerrar button  {
+    width: 150px;
+    height: 35px;
+    border-radius: 20px;
+    background-color: #374735;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
 
 #wrapper-button-signup {
     display: flex;
@@ -341,7 +354,7 @@ input {
     width: 150px;
     height: 35px;
     border-radius: 20px;
-    background-color: #5a7257;
+    background-color: #374735;
     color: white;
     border: none;
     cursor: pointer;
@@ -363,7 +376,7 @@ input {
     width: 150px;
     height: 35px;
     border-radius: 20px;
-    background-color:#5a7257;
+    background-color: #374735;
     color: white;
     border: none;
     cursor: pointer;
@@ -393,7 +406,7 @@ input {
     
         width: 150px;
         height: 40px;
-        background-color: #5a7257;
+        background-color: #374735;
         border-radius: 20px;
         border: none;
         cursor: pointer;
@@ -405,7 +418,7 @@ input {
     
     width: 150px;
     height: 40px;
-    background-color: #5a7257;
+    background-color: #374735;
     border-radius: 20px;
     border: none;
     cursor: pointer;
