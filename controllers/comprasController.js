@@ -59,7 +59,7 @@ export const comprarProductos = async (req, res) => {
             proveedor, 
             productos: productosComprados,
             totalCompra,
-            fecha: new Date()
+            fecha
         });
 
         await nuevaCompra.save();
