@@ -19,7 +19,7 @@ const CompraSchema = new Schema({
     CFecha: { 
         type: Date, 
         required: true,
-        default: Date.now 
+
     },
     CFormaPago: { 
         type: String,
