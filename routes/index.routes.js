@@ -5,7 +5,7 @@ import { crearProducto, verificarProducto, modificarProducto, eliminarProducto, 
 import { crearTercero, verificarTercero, modificarTercero, eliminarTercero, obtenerTerceros } from "../controllers/tercerosController.js";
 import { crearVenta, generarReporteVentas } from "../controllers/ventasController.js";
 import { obtenerUsuarios } from "../controllers/userController.js";
-import { comprarProductos, generarReporteCompras } from "../controllers/comprasController.js";
+import { crearCompra, generarReporteCompras } from "../controllers/comprasController.js";
 import { ajusteProducto } from "../controllers/ajusteController.js";
 import { generarReporte } from "../controllers/reportesMovimientosControllers.js";
 import { generarReporteSaldos } from "../controllers/saldosController.js";
