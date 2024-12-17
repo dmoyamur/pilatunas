@@ -1,6 +1,6 @@
 import HistorialAjustes from "../models/historialAjustes.js";
 import { Ventas } from "../models/Ventas.js";
-import Compras from "../models/Compras.js";
+import {Compras} from "../models/Compras.js";
 
 export async function generarReporte(req, res) {
     const { fechaInicio, fechaFin, productoRef } = req.params;
