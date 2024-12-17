@@ -186,18 +186,11 @@ input {
 .button-upper-edit {
     width: 150px;
     height: 40px;
-<<<<<<< HEAD
-    background-color: #374735;
+    background-color: #40533d;
     border-radius: 20px;
     border: none;
     cursor: pointer;
     color:white
-=======
-    background-color: #ABDFA5;
-    border-radius: 20px;
-    border: none;
-    cursor: pointer;
->>>>>>> e6a09d4bd6625c355beacbcd715d14e7f27e1561
 }
 
 #wrapper-form-edit {
@@ -242,18 +235,11 @@ input {
 .button-bottom-edit {
     width: 150px;
     height: 50px;
-<<<<<<< HEAD
-    background-color: #374735;
+    background-color: #40533d;
     border-radius: 20px;
     border: none;
     cursor: pointer;
     color: white
-=======
-    background-color: #ABDFA5;
-    border-radius: 20px;
-    border: none;
-    cursor: pointer;
->>>>>>> e6a09d4bd6625c355beacbcd715d14e7f27e1561
 }
 
 #wrapper-menu {
@@ -311,11 +297,7 @@ input {
 }
 
 #wrapper-close button {
-<<<<<<< HEAD
-    background-color: #374735;
-=======
-    background-color: #70936B;
->>>>>>> e6a09d4bd6625c355beacbcd715d14e7f27e1561
+    background-color: #40533d;
     width: 150px;
     height: 40px;
     border-radius: 20px;
@@ -340,22 +322,11 @@ input {
     width: 150px;
     height: 35px;
     border-radius: 20px;
-    background-color: #374735;
+    background-color: #40533d;
     color: white;
     border: none;
     cursor: pointer;
 }
-
-#wrapper-cerrar button  {
-    width: 150px;
-    height: 35px;
-    border-radius: 20px;
-    background-color: #374735;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-
 
 #wrapper-button-signup {
     display: flex;
@@ -372,11 +343,7 @@ input {
     width: 150px;
     height: 35px;
     border-radius: 20px;
-<<<<<<< HEAD
-    background-color: #374735;
-=======
-    background-color: #70936B;
->>>>>>> e6a09d4bd6625c355beacbcd715d14e7f27e1561
+    background-color: #40533d;
     color: white;
     border: none;
     cursor: pointer;
@@ -398,11 +365,7 @@ input {
     width: 150px;
     height: 35px;
     border-radius: 20px;
-<<<<<<< HEAD
-    background-color: #374735;
-=======
-    background-color: #70936B;
->>>>>>> e6a09d4bd6625c355beacbcd715d14e7f27e1561
+    background-color: #40533d;
     color: white;
     border: none;
     cursor: pointer;
@@ -432,11 +395,7 @@ input {
     
         width: 150px;
         height: 40px;
-<<<<<<< HEAD
-        background-color: #374735;
-=======
-        background-color: #ABDFA5;
->>>>>>> e6a09d4bd6625c355beacbcd715d14e7f27e1561
+        background-color: #40533d;
         border-radius: 20px;
         border: none;
         cursor: pointer;
@@ -448,11 +407,7 @@ input {
     
     width: 150px;
     height: 40px;
-<<<<<<< HEAD
-    background-color: #374735;
-=======
-    background-color: #ABDFA5;
->>>>>>> e6a09d4bd6625c355beacbcd715d14e7f27e1561
+    background-color: #40533d;
     border-radius: 20px;
     border: none;
     cursor: pointer;
@@ -552,7 +507,6 @@ input {
     background-color: (218, 223, 225, 0.1);    text-align: center;
     border: 4px solid #000000;
     border-width: 0px 1px 1px 0px;
-
 }
 
 

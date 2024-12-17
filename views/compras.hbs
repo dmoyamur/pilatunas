@@ -1,40 +1,15 @@
 <div id="filter-background"></div>
 <div id="title-users">
-    <h1>PILATUNAS PAÑALERA</h1>
+    <h1>PILATUNAS PAÑALERIA</h1>
 </div>
 <div id="title-gestion">
     <h1>Gestión de Compras</h1>
 </div>
 
 <div id="wrapper-edit">
-
     <div class="block-edit" id="wrapper-form-crear">
         <form id="comprasForm">
             <div id="mensaje-crear" class="mensaje" style="display: none;"></div>
-        <div>
-        <label for="fecha">Fecha:</label>
-            <input type="date" id="fecha-crear" name="fecha" required>
-        </div>
-
-        <div>
-            <label for="tercero">Seleccione un proveedor</label>
-            <select name="tercero" class="tercero-select" required>
-                <option value="">Seleccione un proveedor</option>
-            </select>
-            </div>
-        <div>
-            <label for="fecha">Fecha:</label>
-            <input type="date" id="fecha-crear" name="fecha" required>
-        </div>
-
-        <div>
-            <label for="cliente"> Proveedor:</label>
-            <select name="tercero" class="tercero-select" required>
-                <option value="">Seleccione un proveedor</option>
-            </select>
-            
-        </div>
-
 
 
             <div>
@@ -43,6 +18,7 @@
                     <thead>
                         <tr>
                             <th>Producto</th>
+                            <th>Proveedor</th>
                             <th>Cantidad</th>
                             <th>Total</th>
                         </tr>
@@ -52,6 +28,11 @@
                             <td>
                                 <select name="referencia-producto" class="producto-select" required>
                                     <option value="">Seleccione un producto</option>
+                                </select>
+                            </td>
+                             <td>
+                                <select name="tercero" class="tercero-select" required>
+                                    <option value="">Seleccione un proveedor</option>
                                 </select>
                             </td>
                             <td>

@@ -1,6 +1,6 @@
 import HistorialAjustes from "../models/historialAjustes.js";
 import { Ventas } from "../models/Ventas.js";
-import {Compras} from "../models/Compras.js";
+import Compras from "../models/Compras.js";
 import Producto from "../models/Productos.js"; 
 
 export async function generarReporteSaldos(req, res) {
